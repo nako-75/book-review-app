@@ -15,6 +15,7 @@ class ReviewController extends Controller
         $book->reviews()->create([
             'user_id' => Auth::id(),
             'comment' => $request->comment,
+            'rating'  => $request->rating,
         ]);
         return back();
     }
@@ -22,21 +23,14 @@ class ReviewController extends Controller
     // 編集画面の表示
     public function edit(Review $review)
     {
-        // 簡易チェック（後でポリシーを設定予定）
-        if ($review->user_id !== Auth::id()) {
-            abort(403);
-        }
-
+        $this->authorize('update', $review);
         return view('reviews.edit', compact('review'));
     }
 
     // 更新処理
     public function update(Request $request, Review $review)
     {
-        // 簡易チェック（後でポリシーを設定予定）
-        if ($review->user_id !== Auth::id()) {
-            abort(403);
-        }
+        $this->authorize('update', $review);
 
         // TODO: 後ほど FormRequest に置き換え
         $review->update([

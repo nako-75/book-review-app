@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -16,13 +17,13 @@ class BookController extends Controller
     }
 
     // 書籍詳細
-    public function show($id)
+    public function show(Book $book)
     {
-        $book = Book::with([
+        $book->load([
             'genres',
             'reviews.user',
             'reviews.likedByUsers'
-        ])->findOrFail($id);
+        ]);
 
         return view('books.show', compact('book'));
     }
@@ -30,19 +31,40 @@ class BookController extends Controller
     // 書籍登録画面
     public function create()
     {
+        $this->authorize('create', Book::class);
         $genres = Genre::all();
         return view('books.create', compact('genres'));
     }
 
+    // 書籍登録
     public function store(Request $request)
     {
-        Book::create($request->all());
-        return redirect()->route('books.index')->with('success', '書籍を登録しました！');
+        $data = $request->all();
+        $data['user_id'] = Auth::id();
+        Book::create($data);
+        return redirect()->route('books.index');
     }
 
     // 書籍編集画面
-    public function edit($book)
+    public function edit(Book $book)
     {
-        return view('books.edit', compact('book'));
+        $this->authorize('update', $book);
+        $genres = Genre::all();
+        return view('books.edit', compact('book','genres'));
+    }
+
+    // 書籍更新処理
+    public function update(Request $request, Book $book)
+    {
+        $this->authorize('update', $book);
+        $book->update($request->all());
+        return redirect()->route('books.show', $book)->with('success', '書籍を更新しました！');
+    }
+
+    public function destroy(Book $book)
+    {
+        $this->authorize('delete', $book);
+        $book->delete();
+        return redirect()->route('books.index')->with('success', '書籍を削除しました！');
     }
 }
