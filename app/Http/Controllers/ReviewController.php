@@ -6,16 +6,20 @@ use App\Models\Book;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreReviewRequest;
+use App\Http\Requests\UpdateReviewRequest;
 
 class ReviewController extends Controller
 {
     // 書籍詳細からの新規投稿
-    public function store(Request $request, Book $book)
+    public function store(StoreReviewRequest $request, Book $book)
     {
+        $validated = $request->validated();
+
         $book->reviews()->create([
-            'user_id' => Auth::id(),
-            'comment' => $request->comment,
-            'rating'  => $request->rating,
+            'user_id' => auth()->id(),
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? null,
         ]);
         return back();
     }
@@ -28,15 +32,11 @@ class ReviewController extends Controller
     }
 
     // 更新処理
-    public function update(Request $request, Review $review)
+    public function update(UpdateReviewRequest $request, Review $review)
     {
         $this->authorize('update', $review);
-
-        // TODO: 後ほど FormRequest に置き換え
-        $review->update([
-            'comment' => $request->comment,
-        ]);
-
+        $validated = $request->validated();
+        $review->update($validated);
         return redirect()->route('books.show', $review->book_id);
     }
 }

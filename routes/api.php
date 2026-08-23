@@ -20,9 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1')->group(function () {
-    Route::get('/books', [ApiBookController::class, 'index']);
-    Route::get('/books/{book}', [ApiBookController::class, 'show']);
-    Route::post('/books', [ApiBookController::class, 'store']);
-    Route::put('/books/{book}', [ApiBookController::class, 'update']);
-    Route::delete('/books/{book}', [ApiBookController::class, 'destroy']);
+    Route::apiResource('books', ApiBookController::class);
 });

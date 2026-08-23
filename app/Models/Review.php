@@ -35,4 +35,9 @@ class Review extends Model
     {
         return $this->belongsToMany(User::class, 'review_likes');
     }
+
+    public function review_likes()
+    {
+        return $this->belongsToMany(User::class, 'review_likes', 'review_id', 'user_id')->withTimestamps();
+    }
 }

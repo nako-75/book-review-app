@@ -1,6 +1,9 @@
 <?php
 
 return [
+
+    'required' => ':attribute は必須です。',
+
     'attributes' => [
         'title' => 'タイトル',
         'author' => '著者',

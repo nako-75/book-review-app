@@ -15,7 +15,10 @@ class BookSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::first();
+        $userIds = User::pluck('id')->toArray();
+        if (empty($userIds)) {
+            return;
+        }
 
         $books = [
             [
@@ -113,7 +116,7 @@ class BookSeeder extends Seeder
             $genreNames = $bookData['genres'];
             unset($bookData['genres']);
 
-            $bookData['user_id'] = $user->id;
+            $bookData['user_id'] = fake()->randomElement($userIds);
             $bookData['image_url'] = "https://placehold.co/200x300/e2e8f0/475569?text={$num}";
 
             $book = Book::firstOrCreate(
