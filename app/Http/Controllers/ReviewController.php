@@ -39,4 +39,25 @@ class ReviewController extends Controller
         $review->update($validated);
         return redirect()->route('books.show', $review->book_id);
     }
+
+    // 削除
+    public function destroy(Review $review)
+    {
+        $this->authorize('delete', $review);
+        $review->delete();
+        return redirect()->route('books.show', $review->book_id);
+    }
+
+    // いいね
+    public function like(Review $review, Request $request)
+    {
+        $user = $request->user();
+        if ($user->likedReviews()->where('review_id', $review->id)->exists()) {
+            $user->likedReviews()->detach($review->id);
+        } else {
+            $user->likedReviews()->attach($review->id);
+        }
+
+        return back();
+    }
 }
