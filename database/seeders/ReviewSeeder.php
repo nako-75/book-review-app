@@ -18,15 +18,31 @@ class ReviewSeeder extends Seeder
         $users = User::all();
         $books = Book::all();
 
+        if ($users->isEmpty() || $books->isEmpty()) {
+            return;
+        }
+
         $comments = [
-            'とても読みやすくて勉強になりました！',
-            '内容が深く、何回も読み返したい一冊です。',
-            '視点が変わる素晴らしい書籍でした。',
-            '初心者にもわかりやすくおすすめです。',
-            '実務ですぐに活かせる知識が詰まっています。',
-            'ストーリーに引き込まれました。',
-            '現代人プレビューの書だと思います。',
-            '考えさせられる内容で非常に有意義でした。',
+            5 => [
+                '非常に素晴らしい内容でした！何度も読み返したい一冊です。',
+                '実務ですぐに活かせる知識が詰まっています。',
+            ],
+            4 => [
+                'とてもタメになる良書でした。おすすめできます。',
+                '初心者にもわかりやすくおすすめです。',
+            ],
+            3 => [
+                '標準的で読みやすい内容でした。普通に楽しめます。',
+                '内容が深く、参考にはなりました。',
+            ],
+            2 => [
+                '少し期待外れな部分もありましたが、何とか読み終えました。',
+                'もう少し具体的な解説が欲しかったです。',
+            ],
+            1 => [
+                '自分にはあまり合いませんでした。',
+                '期待していた内容とは少し異なっていました。',
+            ],
         ];
 
         foreach ($books as $bookIndex => $book) {
@@ -35,11 +51,16 @@ class ReviewSeeder extends Seeder
             for ($i = 0; $i < $reviewCount; $i++) {
                 $user = $users[($bookIndex + $i) % $users->count()];
 
+                $rating = rand(1, 5);
+
+                $ratingComments = $comments[$rating];
+                $comment = $ratingComments[($bookIndex + $i) % count($ratingComments)];
+
                 Review::create([
                     'book_id' => $book->id,
                     'user_id' => $user->id,
-                    'rating' => rand(3, 5),
-                    'comment' => $comments[($bookIndex + $i) % count($comments)],
+                    'rating' => $rating,
+                    'comment' => $comment,
                 ]);
             }
         }
