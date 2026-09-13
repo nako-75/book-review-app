@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Requests\UpdateBookRequest;
 
@@ -109,5 +110,33 @@ class BookController extends Controller
         $this->authorize('delete', $book);
         $book->delete();
         return redirect()->route('books.index')->with('success', '書籍を削除しました！');
+    }
+
+    /**
+     * 指定されたISBNコードを基にGoogle Books APIから書籍情報を取得する
+     *
+     * @param string $isbn
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function fetchBookByIsbn(string $isbn): \Illuminate\Http\JsonResponse
+    {
+        $response = Http::get("https://www.googleapis.com/books/v1/volumes", [
+            'q' => 'isbn:' . $isbn,
+            'key' => env('GOOGLE_BOOKS_API_KEY'),
+        ]);
+
+        if ($response->successful() && isset($response->json()['items'][0])) {
+            $volumeInfo = $response->json()['items'][0]['volumeInfo'];
+
+            return response()->json([
+                'title' => $volumeInfo['title'] ?? '',
+                'author' => isset($volumeInfo['authors']) ? implode(', ', $volumeInfo['authors']) : '',
+                'description' => $volumeInfo['description'] ?? '',
+                'image_url' => $volumeInfo['imageLinks']['thumbnail'] ?? '',
+                'published_date' => $volumeInfo['publishedDate'] ?? '',
+            ]);
+        }
+
+        return response()->json(['error' => '該当する書籍が見つかりませんでした。'], 404);
     }
 }
