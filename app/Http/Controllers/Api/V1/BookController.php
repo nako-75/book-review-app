@@ -50,7 +50,11 @@ class BookController extends Controller
     // 書籍登録
     public function store(StoreBookRequest $request)
     {
+        $this->authorize('create', Book::class);
+
         $validated = $request->validated();
+        $validated['user_id'] = $request->user()->id;
+
         $book = Book::create($validated);
         if (isset($validated['genres'])) {
             $book->genres()->sync($validated['genres']);
@@ -62,6 +66,8 @@ class BookController extends Controller
     // 書籍更新
     public function update(UpdateBookRequest $request, Book $book)
     {
+        $this->authorize('update', $book);
+
         $validated = $request->validated();
 
         $book->update($validated);
@@ -75,6 +81,8 @@ class BookController extends Controller
     // 書籍削除
     public function destroy(Book $book)
     {
+        $this->authorize('delete', $book);
+
         $book->delete();
         return response()->json(null, 204);
     }

@@ -20,5 +20,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1')->group(function () {
-    Route::apiResource('books', ApiBookController::class);
+    // 認証不要
+    Route::get('books', [ApiBookController::class, 'index']);
+    Route::get('books/{book}', [ApiBookController::class, 'show']);
+
+    // 認証必要
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('books', [ApiBookController::class, 'store']);
+        Route::put('books/{book}', [ApiBookController::class, 'update']);
+        Route::delete('books/{book}', [ApiBookController::class, 'destroy']);
+    });
 });
