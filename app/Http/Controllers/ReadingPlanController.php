@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ReadingPlan;
 use App\Enums\ReadingPlanStatus;
+use App\Models\Book;
 
 class ReadingPlanController extends Controller
 {
@@ -29,10 +30,55 @@ class ReadingPlanController extends Controller
     // 新規作成画面
     public function create()
     {
-        return view('reading-plans.create');
+        $books = Book::all();
+        return view('reading-plans.create', compact('books'));
     }
 
-    // 更新
+    // 新規登録の保存
+    public function store(Request $request)
+    {
+        $request->validate([
+            'book_id' => 'required|exists:books,id',
+            'target_date' => 'required|date|after_or_equal:today',
+        ]);
+
+        ReadingPlan::create([
+            'user_id' => Auth::id(),
+            'book_id' => $request->book_id,
+            'target_date' => $request->target_date,
+            'status' => ReadingPlanStatus::Reading,
+        ]);
+
+        return redirect()->route('reading-plans.index')->with('success', '読書計画を作成しました！');
+    }
+
+    // 編集画面
+    public function edit(ReadingPlan $readingPlan)
+    {
+        $this->authorize('update', $readingPlan);
+        $books = Book::all();
+        return view('reading-plans.edit', compact('readingPlan', 'books'));
+    }
+
+    // 編集内容の更新
+    public function update(Request $request, ReadingPlan $readingPlan)
+    {
+        $this->authorize('update', $readingPlan);
+
+        $request->validate([
+            'book_id' => 'required|exists:books,id',
+            'target_date' => 'required|date',
+        ]);
+
+        $readingPlan->update([
+            'book_id' => $request->book_id,
+            'target_date' => $request->target_date,
+        ]);
+
+        return redirect()->route('reading-plans.index')->with('success', '読書計画を更新しました！');
+    }
+
+    // 完了にする更新
     public function complete(ReadingPlan $readingPlan)
     {
         $this->authorize('update', $readingPlan);
@@ -43,13 +89,6 @@ class ReadingPlanController extends Controller
         ]);
 
         return redirect()->route('reading-plans.index')->with('success', '読書計画を完了にしました！');
-    }
-
-    // 編集画面
-    public function edit(ReadingPlan $readingPlan)
-    {
-        $this->authorize('update', $readingPlan);
-        return view('reading-plans.edit', compact('readingPlan'));
     }
 
     // 削除処理
