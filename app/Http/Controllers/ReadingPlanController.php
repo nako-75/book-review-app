@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ReadingPlan;
 use App\Enums\ReadingPlanStatus;
 use App\Models\Book;
+use App\Http\Requests\StoreReadingPlanRequest;
+use App\Http\Requests\UpdateReadingPlanRequest;
 
 class ReadingPlanController extends Controller
 {
@@ -35,15 +37,10 @@ class ReadingPlanController extends Controller
     }
 
     // 新規登録の保存
-    public function store(Request $request)
+    public function store(StoreReadingPlanRequest $request)
     {
-        $request->validate([
-            'book_id' => 'required|exists:books,id',
-            'target_date' => 'required|date|after_or_equal:today',
-        ]);
-
         ReadingPlan::create([
-            'user_id' => Auth::id(),
+            'user_id' => $request->user()->id,
             'book_id' => $request->book_id,
             'target_date' => $request->target_date,
             'status' => ReadingPlanStatus::Reading,
@@ -61,17 +58,11 @@ class ReadingPlanController extends Controller
     }
 
     // 編集内容の更新
-    public function update(Request $request, ReadingPlan $readingPlan)
+    public function update(UpdateReadingPlanRequest $request, ReadingPlan $readingPlan)
     {
         $this->authorize('update', $readingPlan);
 
-        $request->validate([
-            'book_id' => 'required|exists:books,id',
-            'target_date' => 'required|date',
-        ]);
-
         $readingPlan->update([
-            'book_id' => $request->book_id,
             'target_date' => $request->target_date,
         ]);
 
