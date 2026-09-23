@@ -18,7 +18,12 @@ class Book extends Model
         'isbn',
         'published_date',
         'description',
-        'image_url'
+        'image_url',
+        'created_at'
+    ];
+
+    protected $casts = [
+        'published_date' => 'date',
     ];
 
     public function user()
