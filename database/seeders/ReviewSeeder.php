@@ -45,16 +45,16 @@ class ReviewSeeder extends Seeder
             ],
         ];
 
-        foreach ($books as $bookIndex => $book) {
-            $reviewCount = ($bookIndex % 3) + 2;
+        foreach ($books as $book) {
+            $reviewCount = rand(2, 4);
 
             for ($i = 0; $i < $reviewCount; $i++) {
-                $user = $users[($bookIndex + $i) % $users->count()];
+                $user = $users->random();
 
                 $rating = rand(1, 5);
 
                 $ratingComments = $comments[$rating];
-                $comment = $ratingComments[($bookIndex + $i) % count($ratingComments)];
+                $comment = $ratingComments[array_rand($ratingComments)];
 
                 Review::create([
                     'book_id' => $book->id,

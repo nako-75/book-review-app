@@ -6,11 +6,7 @@ use App\Models\User;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Review;
-use Database\Seeders\BookSeeder;
-use Database\Seeders\FavoriteSeeder;
-use Database\Seeders\GenreSeeder;
-use Database\Seeders\ReviewLikeSeeder;
-use Database\Seeders\UserSeeder;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -40,13 +36,13 @@ class ScreenAccessTest extends TestCase
 
     public function test_book_detail_can_be_accessed(): void
     {
-        $this->seed(UserSeeder::class);
-        $this->seed(GenreSeeder::class);
-        $this->seed(BookSeeder::class);
-
+        $this->seed(DatabaseSeeder::class);
+        $user = User::first();
         $book = Book::first();
+        $book->user_id = $user->id;
+        $book->save();
 
-        $response = $this->get("/books/{$book->id}");
+        $response = $this->actingAs($user)->get("/books/{$book->id}");
         $response->assertStatus(200);
     }
 
@@ -86,15 +82,15 @@ class ScreenAccessTest extends TestCase
 
     public function test_authenticated_user_can_access_protected_pages(): void
     {
-        $this->seed(UserSeeder::class);
-        $this->seed(BookSeeder::class);
-        $this->seed(GenreSeeder::class);
-        $this->seed(FavoriteSeeder::class);
-        $this->seed(ReviewLikeSeeder::class);
+        $this->seed(DatabaseSeeder::class);
 
-        $book = Book::with('user')->first();
+        $user = User::first();
+        $book = Book::first();
+        $book->user_id = $user->id;
+        $book->save();
 
-        $user = $book->user ?? User::first();
+        $genre = Genre::first();
+
         $this->actingAs($user);
 
         $review = Review::where('user_id', $user->id)->first() ?? Review::create([
@@ -103,8 +99,6 @@ class ScreenAccessTest extends TestCase
             'comment' => 'テストレビュー',
             'rating' => 5,
         ]);
-
-        $genre = Genre::first();
 
         $this->get('/books/create')->assertStatus(200);
         $this->get("/books/{$book->id}/edit")->assertStatus(200);

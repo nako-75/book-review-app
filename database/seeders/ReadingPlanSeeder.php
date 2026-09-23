@@ -41,7 +41,7 @@ class ReadingPlanSeeder extends Seeder
             'user_id' => $mainUser->id,
             'book_id' => $books->random()->id,
             'target_date' => Carbon::today()->subDays(5),
-            'status' => ReadingPlanStatus::Unread,
+            'status' => ReadingPlanStatus::Expired,
             'completed_at' => null,
         ]);
 
@@ -77,7 +77,7 @@ class ReadingPlanSeeder extends Seeder
             'user_id' => $otherUser->id,
             'book_id' => $books->random()->id,
             'target_date' => Carbon::today()->addDays(7),
-            'status' => ReadingPlanStatus::Unread,
+            'status' => ReadingPlanStatus::Reading,
             'completed_at' => null,
         ]);
     }

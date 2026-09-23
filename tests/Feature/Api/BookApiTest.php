@@ -5,8 +5,8 @@ namespace Tests\Feature\Api;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Book;
-use \App\Models\Genre;
-use \App\Models\User;
+use App\Models\Genre;
+use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 
 class BookApiTest extends TestCase
@@ -41,7 +41,6 @@ class BookApiTest extends TestCase
     {
         $this->seed(DatabaseSeeder::class);
 
-        // シーダーによって作成された最初の書籍IDを取得して詳細を取得
         $book = Book::first();
 
         $response = $this->getJson("/api/v1/books/{$book->id}");
@@ -61,16 +60,56 @@ class BookApiTest extends TestCase
         $response->assertStatus(404);
     }
 
-    // AP03: 書籍を新規登録できること（ステータス201）
-    public function test_can_create_book(): void
+
+    // --- Sanctum 認証セキュリティテスト（未認証時のブロック確認） ---
+
+
+    // 未認証ユーザーは書籍を新規登録できない
+    public function test_unauthenticated_user_cannot_create_book(): void
+    {
+        $response = $this->postJson('/api/v1/books', [
+            'title' => '未認証テスト書籍',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    // 未認証ユーザーは書籍を更新できない
+    public function test_unauthenticated_user_cannot_update_book(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $book = Book::first();
+
+        $response = $this->putJson("/api/v1/books/{$book->id}", [
+            'title' => '改ざんテスト',
+        ]);
+
+        $response->assertStatus(401);
+    }
+
+    // 未認証ユーザーは書籍を削除できない
+    public function test_unauthenticated_user_cannot_delete_book(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $book = Book::first();
+
+        $response = $this->deleteJson("/api/v1/books/{$book->id}");
+
+        $response->assertStatus(401);
+    }
+
+
+    // --- Sanctum 認証済みユーザーの操作テスト ---
+
+
+    // AP03: Sanctum認証済みユーザーは書籍を新規登録できる
+    public function test_can_create_book_with_sanctum_auth(): void
     {
         $this->seed(DatabaseSeeder::class);
         $genre = Genre::first();
         $user = User::first();
 
-        $this->actingAs($user);
-
-        $bookData = [
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', [
             'user_id' => $user ? $user->id : 1,
             'title' => 'APIテスト書籍',
             'author' => 'テスト作者',
@@ -78,9 +117,7 @@ class BookApiTest extends TestCase
             'published_date' => '2026-08-30',
             'description' => 'API経由での登録テストです。',
             'genres' => $genre ? [$genre->id] : [],
-        ];
-
-        $response = $this->postJson('/api/v1/books', $bookData);
+        ]);
 
         $response->assertStatus(201)
                 ->assertJsonFragment(['title' => 'APIテスト書籍']);
@@ -88,20 +125,26 @@ class BookApiTest extends TestCase
         $this->assertDatabaseHas('books', ['title' => 'APIテスト書籍']);
     }
 
-    // AP03のバリデーション: 必須項目が空のときはエラーになること
+    // AP03のバリデーション: 認証済みでも必須項目が空のときはエラーになる
     public function test_book_creation_requires_fields(): void
     {
-        $response = $this->postJson('/api/v1/books', []);
+        $this->seed(DatabaseSeeder::class);
+        $user = User::first();
+
+        $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', []);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['title', 'author', 'isbn','user_id']);
+                ->assertJsonValidationErrors(['title', 'author', 'isbn', 'user_id']);
     }
 
-    // AP04: 書籍を更新できること
-    public function test_can_update_book(): void
+    // AP04: Sanctum認証済みユーザーは書籍を更新できる
+    public function test_can_update_book_with_sanctum_auth(): void
     {
         $this->seed(DatabaseSeeder::class);
+        $user = User::first();
         $book = Book::first();
+        $book->user_id = $user->id;
+        $book->save();
 
         $updateData = [
             'title' => '新しいタイトルに更新',
@@ -111,7 +154,7 @@ class BookApiTest extends TestCase
             'description' => $book->description,
         ];
 
-        $response = $this->putJson("/api/v1/books/{$book->id}", $updateData);
+        $response = $this->actingAs($user, 'sanctum')->putJson("/api/v1/books/{$book->id}", $updateData);
 
         $response->assertStatus(200)
                 ->assertJsonFragment(['title' => '新しいタイトルに更新']);
@@ -119,13 +162,16 @@ class BookApiTest extends TestCase
         $this->assertDatabaseHas('books', ['title' => '新しいタイトルに更新']);
     }
 
-    // AP05: 書籍を削除できること（ステータス204）
-    public function test_can_delete_book(): void
+    // AP05: Sanctum認証済みユーザーは書籍を削除できる
+    public function test_can_delete_book_with_sanctum_auth(): void
     {
         $this->seed(DatabaseSeeder::class);
+        $user = User::first();
         $book = Book::first();
+        $book->user_id = $user->id;
+        $book->save();
 
-        $response = $this->deleteJson("/api/v1/books/{$book->id}");
+        $response = $this->actingAs($user, 'sanctum')->deleteJson("/api/v1/books/{$book->id}");
 
         $response->assertStatus(204);
 
