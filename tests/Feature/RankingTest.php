@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use Database\Seeders\UserSeeder;
 use Database\Seeders\BookSeeder;
 use Database\Seeders\ReviewSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

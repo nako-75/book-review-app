@@ -1,14 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
-use App\Http\Controllers\GenreController;
-use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\RankingController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ReadingPlanController;
+use App\Http\Controllers\GenreController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RankingController;
+use App\Http\Controllers\ReadingPlanController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReviewController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +21,7 @@ use App\Http\Controllers\NotificationController;
 |
 */
 
-//ログイン
+// ログイン
 
 Route::middleware(['auth'])->group(function () {
 
@@ -70,7 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
-//未ログインOK
+// 未ログインOK
 
 Route::get('/', [BookController::class, 'index'])->name('books.index');
 Route::get('/books', [BookController::class, 'index']);

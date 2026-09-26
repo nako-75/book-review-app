@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Genre;
+use App\Models\User;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -48,7 +48,7 @@ class GenreManagementTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('genres', [
-            'id'   => $genre->id,
+            'id' => $genre->id,
             'name' => '新ジャンル名',
         ]);
     }

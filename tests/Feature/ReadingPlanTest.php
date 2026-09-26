@@ -2,13 +2,12 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
-use App\Models\User;
+use App\Enums\ReadingPlanStatus;
 use App\Models\Book;
 use App\Models\ReadingPlan;
-use App\Enums\ReadingPlanStatus;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReadingPlanTest extends TestCase
 {
@@ -30,23 +29,23 @@ class ReadingPlanTest extends TestCase
         $user = User::factory()->create();
 
         $book = Book::create([
-            'title'          => 'テスト用の本',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト用の本',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $response = $this->actingAs($user)->post(route('reading-plans.store'), [
-            'book_id'     => $book->id,
+            'book_id' => $book->id,
             'target_date' => '2026-12-31',
         ]);
 
         $response->assertRedirect(route('reading-plans.index'));
 
         $this->assertDatabaseHas('reading_plans', [
-            'user_id'     => $user->id,
-            'book_id'     => $book->id,
+            'user_id' => $user->id,
+            'book_id' => $book->id,
             'target_date' => '2026-12-31',
         ]);
     }
@@ -57,18 +56,18 @@ class ReadingPlanTest extends TestCase
         $user = User::factory()->create();
 
         $book = Book::create([
-            'title'          => 'テスト用の本',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト用の本',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $readingPlan = ReadingPlan::create([
-            'user_id'     => $user->id,
-            'book_id'     => $book->id,
+            'user_id' => $user->id,
+            'book_id' => $book->id,
             'target_date' => '2026-12-31',
-            'status'      => ReadingPlanStatus::Reading,
+            'status' => ReadingPlanStatus::Reading,
         ]);
 
         $response = $this->actingAs($user)->post(route('reading-plans.complete', $readingPlan));
@@ -76,7 +75,7 @@ class ReadingPlanTest extends TestCase
         $response->assertRedirect(route('reading-plans.index'));
 
         $this->assertDatabaseHas('reading_plans', [
-            'id'     => $readingPlan->id,
+            'id' => $readingPlan->id,
             'status' => ReadingPlanStatus::Completed,
         ]);
     }
@@ -87,18 +86,18 @@ class ReadingPlanTest extends TestCase
         $user = User::factory()->create();
 
         $book = Book::create([
-            'title'          => 'テスト用の本',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト用の本',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $readingPlan = ReadingPlan::create([
-            'user_id'     => $user->id,
-            'book_id'     => $book->id,
+            'user_id' => $user->id,
+            'book_id' => $book->id,
             'target_date' => '2026-12-31',
-            'status'      => ReadingPlanStatus::Reading,
+            'status' => ReadingPlanStatus::Reading,
         ]);
 
         $response = $this->actingAs($user)->put(route('reading-plans.update', $readingPlan), [
@@ -108,7 +107,7 @@ class ReadingPlanTest extends TestCase
         $response->assertRedirect(route('reading-plans.index'));
 
         $this->assertDatabaseHas('reading_plans', [
-            'id'          => $readingPlan->id,
+            'id' => $readingPlan->id,
             'target_date' => '2027-01-01',
         ]);
     }
@@ -119,18 +118,18 @@ class ReadingPlanTest extends TestCase
         $user = User::factory()->create();
 
         $book = Book::create([
-            'title'          => 'テスト用の本',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト用の本',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $readingPlan = ReadingPlan::create([
-            'user_id'     => $user->id,
-            'book_id'     => $book->id,
+            'user_id' => $user->id,
+            'book_id' => $book->id,
             'target_date' => '2026-12-31',
-            'status'      => ReadingPlanStatus::Reading,
+            'status' => ReadingPlanStatus::Reading,
         ]);
 
         $response = $this->actingAs($user)->delete(route('reading-plans.destroy', $readingPlan));
@@ -147,18 +146,18 @@ class ReadingPlanTest extends TestCase
         $otherUser = User::factory()->create();
 
         $book = Book::create([
-            'title'          => 'テスト用の本',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト用の本',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $owner->id,
+            'user_id' => $owner->id,
         ]);
 
         $readingPlan = ReadingPlan::create([
-            'user_id'     => $owner->id,
-            'book_id'     => $book->id,
+            'user_id' => $owner->id,
+            'book_id' => $book->id,
             'target_date' => '2026-12-31',
-            'status'      => ReadingPlanStatus::Reading,
+            'status' => ReadingPlanStatus::Reading,
         ]);
 
         $response = $this->actingAs($otherUser)->put(route('reading-plans.update', $readingPlan), [

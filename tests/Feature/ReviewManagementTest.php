@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Book;
 use App\Models\Review;
+use App\Models\User;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,15 +20,15 @@ class ReviewManagementTest extends TestCase
         $user = User::first();
 
         $book = Book::create([
-            'title'          => 'レビュー対象の書籍',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'レビュー対象の書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $response = $this->actingAs($user)->post("/books/{$book->id}/reviews", [
-            'rating'  => 5,
+            'rating' => 5,
             'comment' => 'とても素晴らしい本でした！',
         ]);
 
@@ -38,7 +38,7 @@ class ReviewManagementTest extends TestCase
         $this->assertDatabaseHas('reviews', [
             'book_id' => $book->id,
             'user_id' => $user->id,
-            'rating'  => 5,
+            'rating' => 5,
             'comment' => 'とても素晴らしい本でした！',
         ]);
     }
@@ -51,22 +51,22 @@ class ReviewManagementTest extends TestCase
         $user = User::first();
 
         $book = Book::create([
-            'title'          => 'レビュー対象の書籍',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'レビュー対象の書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $review = Review::create([
             'book_id' => $book->id,
             'user_id' => $user->id,
-            'rating'  => 3,
+            'rating' => 3,
             'comment' => '編集前のコメントです。',
         ]);
 
         $response = $this->actingAs($user)->put("/reviews/{$review->id}", [
-            'rating'  => 4,
+            'rating' => 4,
             'comment' => '編集後のコメントに更新しました！',
         ]);
 
@@ -74,8 +74,8 @@ class ReviewManagementTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('reviews', [
-            'id'      => $review->id,
-            'rating'  => 4,
+            'id' => $review->id,
+            'rating' => 4,
             'comment' => '編集後のコメントに更新しました！',
         ]);
     }
@@ -87,17 +87,17 @@ class ReviewManagementTest extends TestCase
         $user = User::first();
 
         $book = Book::create([
-            'title'          => 'レビュー対象の書籍',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'レビュー対象の書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $review = Review::create([
             'book_id' => $book->id,
             'user_id' => $user->id,
-            'rating'  => 5,
+            'rating' => 5,
             'comment' => '削除テスト用のコメントです。',
         ]);
 

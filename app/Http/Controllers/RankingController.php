@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Book;
+use Illuminate\View\View;
 
 class RankingController extends Controller
 {
-    // ランキング
-    public function index()
+    /**
+     * レビュー評価に基づく書籍ランキングを表示する
+     */
+    public function index(): View
     {
-        $rankedBooks = Book::withCount('reviews')
-                           ->withAvg('reviews', 'rating')
-                           ->orderBy('reviews_avg_rating', 'desc')
-                           ->take(10)
-                           ->get();
+        $rankedBooks = Book::has('reviews')
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
+            ->orderBy('reviews_avg_rating', 'desc')
+            ->take(10)
+            ->get();
+
         return view('ranking.index', compact('rankedBooks'));
     }
 }
