@@ -27,7 +27,7 @@ class ReviewController extends Controller
             'comment' => $validated['comment'] ?? null,
         ]);
 
-        return back();
+        return back()->with('success', 'レビューを投稿しました。');
     }
 
     /**
@@ -49,7 +49,7 @@ class ReviewController extends Controller
         $validated = $request->validated();
         $review->update($validated);
 
-        return redirect()->route('books.show', $review->book_id);
+        return redirect()->route('books.show', $review->book_id)->with('success', 'レビューを更新しました。');
     }
 
     /**
@@ -62,7 +62,7 @@ class ReviewController extends Controller
             $review->delete();
         });
 
-        return redirect()->route('books.show', $review->book_id);
+        return redirect()->route('books.show', $review->book_id)->with('success', 'レビューを削除しました。');
     }
 
     /**

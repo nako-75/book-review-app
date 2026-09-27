@@ -16,4 +16,13 @@ enum ReadingPlanStatus: int
             self::Expired => '期限切れ',
         };
     }
+
+    public function badgeClass(): string
+    {
+        return match($this) {
+            self::Reading => 'bg-gray-100 text-gray-800',
+            self::Completed => 'bg-blue-100 text-blue-800',
+            self::Expired => 'bg-green-100 text-green-800',
+        };
+    }
 }

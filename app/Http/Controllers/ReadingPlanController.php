@@ -23,8 +23,8 @@ class ReadingPlanController extends Controller
         $query = ReadingPlan::where('user_id', $userId)->with('book');
 
         // フィルタリング
-        $currentStatus = $request->input('status');
-        if (! empty($currentStatus)) {
+        $currentStatus = $request->filled('status') ? (int) $request->input('status') : null;
+        if ($currentStatus !== null) {
             $query->where('status', $currentStatus);
         }
 

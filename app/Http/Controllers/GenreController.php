@@ -46,7 +46,7 @@ class GenreController extends Controller
     {
         Genre::create($request->validated());
 
-        return redirect()->route('genres.index');
+        return redirect()->route('genres.index')->with('success', 'ジャンルを登録しました。');
     }
 
     /**
@@ -64,7 +64,7 @@ class GenreController extends Controller
     {
         $genre->update($request->validated());
 
-        return redirect()->route('genres.index');
+        return redirect()->route('genres.index')->with('success', 'ジャンルを更新しました。');
     }
 
     /**
