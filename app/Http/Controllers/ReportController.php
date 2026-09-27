@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Review;
 use App\Models\Genre;
+use App\Models\Review;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class ReportController extends Controller
 {
-    public function index()
+    /**
+     * マイ読書レポート（統計・集計データ）を表示する
+     */
+    public function index(): View
     {
         $userId = Auth::id();
         $userReviews = Review::where('user_id', $userId);
 
         // 1. 基本サマリー
         $totalReviews = (clone $userReviews)->count();
-        $booksRead = (clone $userReviews)->distinct('book_id')->count('book_id'); // レビューした書籍数
+        $booksRead = (clone $userReviews)->distinct('book_id')->count('book_id');
         $averageRating = (clone $userReviews)->avg('rating') ?? 0;
 
         // 2. 評価
-        $ratingDistribution = collect();
-        for ($i = 1; $i <= 5; $i++) {
-            $count = Review::where('user_id', $userId)->where('rating', $i)->count();
-            $ratingDistribution->push($count);
-        }
+        $ratingDistribution = collect(range(1, 5))->map(function ($i) use ($userId) {
+            return Review::where('user_id', $userId)->where('rating', $i)->count();
+        });
 
         // 3. 高評価書籍 TOP5
         $topRatedReviews = Review::where('user_id', $userId)
@@ -41,7 +42,7 @@ class ReportController extends Controller
                 'author' => $review->book->author ?? '',
                 'rating' => $review->rating,
             ];
-        })->filter(fn($item) => $item['id'] !== null)->values();
+        })->filter(fn ($item) => $item['id'] !== null)->values();
 
         // 4. ジャンル別評価傾向 TOP5
         $genres = Genre::with(['books.reviews' => function ($query) use ($userId) {
@@ -59,10 +60,10 @@ class ReportController extends Controller
                 'count' => $count,
                 'average_rating' => $avgRating,
             ];
-        })->filter(fn($item) => $item['count'] > 0)
-        ->sortByDesc('average_rating')
-        ->take(5)
-        ->values();
+        })->filter(fn ($item) => $item['count'] > 0)
+            ->sortByDesc('average_rating')
+            ->take(5)
+            ->values();
 
         $stats = [
             'summary' => [

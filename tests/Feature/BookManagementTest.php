@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\Genre;
 use App\Models\Book;
-use Database\Seeders\UserSeeder;
-use Database\Seeders\GenreSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use App\Models\Genre;
 use App\Models\Review;
+use App\Models\User;
+use Database\Seeders\GenreSeeder;
+use Database\Seeders\UserSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Tests\TestCase;
 
 class BookManagementTest extends TestCase
 {
@@ -26,21 +26,21 @@ class BookManagementTest extends TestCase
         $genre = Genre::first();
 
         $response = $this->actingAs($user)->post('/books', [
-            'title'          => 'テスト新規書籍タイトル',
-            'author'         => 'テスト著者名',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト新規書籍タイトル',
+            'author' => 'テスト著者名',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'description'    => '任意の詳細説明文です。',
-            'image_url'      => 'https://example.com/image.jpg',
-            'genres'         => [$genre->id],
+            'description' => '任意の詳細説明文です。',
+            'image_url' => 'https://example.com/image.jpg',
+            'genres' => [$genre->id],
         ]);
 
         $response->assertSessionHasNoErrors();
-        $response->assertRedirect(); 
+        $response->assertRedirect();
 
         $this->assertDatabaseHas('books', [
-            'title'   => 'テスト新規書籍タイトル',
-            'author'  => 'テスト著者名',
+            'title' => 'テスト新規書籍タイトル',
+            'author' => 'テスト著者名',
             'user_id' => $user->id,
         ]);
     }
@@ -55,26 +55,26 @@ class BookManagementTest extends TestCase
         $genre = Genre::first();
 
         $book = Book::create([
-            'title'          => '編集前のタイトル',
-            'author'         => '編集前の著者',
-            'isbn'           => '9784163907154',
+            'title' => '編集前のタイトル',
+            'author' => '編集前の著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $response = $this->actingAs($user)->put("/books/{$book->id}", [
-            'title'          => '編集後のタイトル',
-            'author'         => '編集後の著者',
-            'isbn'           => '9784163907154',
+            'title' => '編集後のタイトル',
+            'author' => '編集後の著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'genres'         => [$genre->id],
+            'genres' => [$genre->id],
         ]);
 
         $response->assertSessionHasNoErrors();
         $response->assertRedirect();
 
         $this->assertDatabaseHas('books', [
-            'id'    => $book->id,
+            'id' => $book->id,
             'title' => '編集後のタイトル',
             'author' => '編集後の著者',
         ]);
@@ -87,11 +87,11 @@ class BookManagementTest extends TestCase
         $user = User::first();
 
         $book = Book::create([
-            'title'          => '削除テスト用タイトル',
-            'author'         => '削除テスト用著者',
-            'isbn'           => '9784163907154',
+            'title' => '削除テスト用タイトル',
+            'author' => '削除テスト用著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $response = $this->actingAs($user)->delete("/books/{$book->id}");
@@ -162,7 +162,7 @@ class BookManagementTest extends TestCase
         ]);
         $book2->genres()->attach($genre2->id);
 
-        $response = $this->actingAs($user)->get('/books?genre=' . $genre2->id);
+        $response = $this->actingAs($user)->get('/books?genre='.$genre2->id);
 
         $response->assertStatus(200);
         $response->assertSee('Laravel実践');
@@ -202,7 +202,7 @@ class BookManagementTest extends TestCase
         $response->assertSeeInOrder(['B Book', 'C Book']);
     }
 
-        // タイトル順のテスト
+    // タイトル順のテスト
     public function test_can_sort_books_by_title()
     {
         $user = User::factory()->create();
@@ -234,8 +234,8 @@ class BookManagementTest extends TestCase
         $response->assertSeeInOrder(['A Book', 'B Book', 'C Book']);
     }
 
-        //　評価が高い順のテスト
-        public function test_can_sort_books_by_rating()
+    //　評価が高い順のテスト
+    public function test_can_sort_books_by_rating()
     {
         $user = User::factory()->create();
 
@@ -283,25 +283,25 @@ class BookManagementTest extends TestCase
         $genre = Genre::first();
 
         $book = Book::create([
-            'title'          => 'ユーザーAの本',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => 'ユーザーAの本',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $userA->id,
+            'user_id' => $userA->id,
         ]);
 
         $response = $this->actingAs($userB)->put("/books/{$book->id}", [
-            'title'          => '改ざんタイトル',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => '改ざんタイトル',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'genres'         => [$genre->id],
+            'genres' => [$genre->id],
         ]);
 
         $response->assertStatus(403);
 
         $this->assertDatabaseHas('books', [
-            'id'    => $book->id,
+            'id' => $book->id,
             'title' => 'ユーザーAの本',
         ]);
     }
@@ -313,11 +313,11 @@ class BookManagementTest extends TestCase
         $userB = User::factory()->create();
 
         $book = Book::create([
-            'title'          => 'ユーザーAの本',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => 'ユーザーAの本',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $userA->id,
+            'user_id' => $userA->id,
         ]);
 
         $response = $this->actingAs($userB)->delete("/books/{$book->id}");
@@ -329,18 +329,18 @@ class BookManagementTest extends TestCase
         ]);
     }
 
-     // 未ログインの書籍登録（認可のテスト）
+    // 未ログインの書籍登録（認可のテスト）
     public function test_guest_cannot_create_a_book(): void
     {
         $this->seed(GenreSeeder::class);
         $genre = Genre::first();
 
         $response = $this->post('/books', [
-            'title'          => 'ゲストの投稿',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => 'ゲストの投稿',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'genres'         => [$genre->id],
+            'genres' => [$genre->id],
         ]);
 
         $response->assertRedirect(route('login'));
@@ -351,17 +351,17 @@ class BookManagementTest extends TestCase
     {
         $user = User::factory()->create();
         $book = Book::create([
-            'title'          => '元のタイトル',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => '元のタイトル',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $response = $this->put("/books/{$book->id}", [
-            'title'          => '改ざんタイトル',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => '改ざんタイトル',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
         ]);
 
@@ -373,11 +373,11 @@ class BookManagementTest extends TestCase
     {
         $user = User::factory()->create();
         $book = Book::create([
-            'title'          => '削除対象の本',
-            'author'         => '著者',
-            'isbn'           => '9784163907154',
+            'title' => '削除対象の本',
+            'author' => '著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
 
         $response = $this->delete("/books/{$book->id}");
@@ -399,10 +399,10 @@ class BookManagementTest extends TestCase
                             'title' => 'テスト自動取得タイトル',
                             'authors' => ['テスト著者名'],
                             'publishedDate' => '2026-01-01',
-                        ]
-                    ]
-                ]
-            ], 200)
+                        ],
+                    ],
+                ],
+            ], 200),
         ]);
 
         $response = $this->actingAs($user)->get('/books/isbn/9784163907154');

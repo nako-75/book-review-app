@@ -2,21 +2,22 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Notification;
 use App\Models\ReadingPlan;
+use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 
 class ReadingPlanReminderNotification extends Notification
 {
     use Queueable;
 
-    protected $readingPlan;
-    protected $timingType;
+    protected ReadingPlan $readingPlan;
+
+    protected string $timingType;
 
     /**
-     * @param ReadingPlan $readingPlan
-     * @param string $timingType 'three_days_before' | 'on_due_date' | 'three_days_after'
+     * コンストラクタ
+     *
+     * @param  string  $timingType  'three_days_before' | 'on_due_date' | 'three_days_after'
      */
     public function __construct(ReadingPlan $readingPlan, string $timingType = 'on_due_date')
     {
@@ -24,16 +25,25 @@ class ReadingPlanReminderNotification extends Notification
         $this->timingType = $timingType;
     }
 
+    /**
+     * 通知の送信チャネルを取得する
+     *
+     * @return array<int, string>
+     */
     public function via(object $notifiable): array
     {
         return ['database'];
     }
 
+    /**
+     * 通知の配列表現を取得する
+     *
+     * @return array<string, mixed>
+     */
     public function toArray(object $notifiable): array
     {
         $bookTitle = $this->readingPlan->book->title ?? '書籍';
 
-        // タイミングに応じてタイトルと本文を切り替える
         return match ($this->timingType) {
             'three_days_before' => [
                 'reading_plan_id' => $this->readingPlan->id,

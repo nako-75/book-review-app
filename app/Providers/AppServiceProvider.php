@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Laravel\Fortify\Fortify;
 use App\Models\Book;
 use App\Models\Review;
 use App\Policies\BookPolicy;
 use App\Policies\ReviewPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {

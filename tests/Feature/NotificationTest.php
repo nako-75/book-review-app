@@ -2,16 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ReadingPlanStatus;
 use App\Models\Book;
 use App\Models\ReadingPlan;
 use App\Models\User;
-use App\Enums\ReadingPlanStatus;
 use App\Notifications\ReadingPlanReminderNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Tests\TestCase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
 
 class NotificationTest extends TestCase
 {
@@ -20,11 +19,11 @@ class NotificationTest extends TestCase
     private function createTestBook(User $user): Book
     {
         return Book::create([
-            'title'          => 'テスト書籍',
-            'author'         => 'テスト著者',
-            'isbn'           => '9784163907154',
+            'title' => 'テスト書籍',
+            'author' => 'テスト著者',
+            'isbn' => '9784163907154',
             'published_date' => '2026-01-01',
-            'user_id'        => $user->id,
+            'user_id' => $user->id,
         ]);
     }
 
@@ -40,7 +39,7 @@ class NotificationTest extends TestCase
         // 当日期日の計画
         $dueTodayPlan = ReadingPlan::create([
             'user_id' => $user->id,
-            'book_id'     => $book->id,
+            'book_id' => $book->id,
             'target_date' => '2026-09-23',
             'status' => ReadingPlanStatus::Reading,
         ]);
@@ -48,7 +47,7 @@ class NotificationTest extends TestCase
         // 過去期日の計画（期限切れ対象）
         $expiredPlan = ReadingPlan::create([
             'user_id' => $user->id,
-            'book_id'     => $book->id,
+            'book_id' => $book->id,
             'target_date' => '2026-09-20',
             'status' => ReadingPlanStatus::Reading,
         ]);
@@ -66,6 +65,7 @@ class NotificationTest extends TestCase
             ReadingPlanReminderNotification::class,
             function ($notification) use ($dueTodayPlan, $user) {
                 $data = $notification->toArray($user);
+
                 return $data['reading_plan_id'] === $dueTodayPlan->id
                     && $data['timing'] === 'on_due_date';
             }
@@ -82,7 +82,7 @@ class NotificationTest extends TestCase
 
         $plan = ReadingPlan::create([
             'user_id' => $user->id,
-            'book_id'     => $book->id,
+            'book_id' => $book->id,
             'target_date' => '2026-09-23',
             'status' => ReadingPlanStatus::Reading,
         ]);
@@ -103,7 +103,7 @@ class NotificationTest extends TestCase
 
         $plan = ReadingPlan::create([
             'user_id' => $user->id,
-            'book_id'     => $book->id,
+            'book_id' => $book->id,
             'target_date' => '2026-09-23',
             'status' => ReadingPlanStatus::Reading,
         ]);

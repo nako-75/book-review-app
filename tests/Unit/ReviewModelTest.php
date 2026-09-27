@@ -2,11 +2,11 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use App\Models\Review;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class ReviewModelTest extends TestCase
 {
@@ -15,7 +15,7 @@ class ReviewModelTest extends TestCase
      * A basic unit test example.
      */
 
-    //プロパティ代入テスト
+    // プロパティ代入テスト
     public function test_review_model_has_fillable_properties(): void
     {
         $review = new Review([
@@ -27,7 +27,7 @@ class ReviewModelTest extends TestCase
         $this->assertEquals(5, $review->rating);
     }
 
-    //fillable代入テスト‚
+    // fillable代入テスト‚
     public function test_it_has_fillable_attributes(): void
     {
         $review = new Review([
@@ -43,50 +43,50 @@ class ReviewModelTest extends TestCase
         $this->assertEquals(5, $review->rating);
     }
 
-    //ユーザーリレーションテスト
+    // ユーザーリレーションテスト
     public function test_it_belongs_to_a_user(): void
     {
-        $review = new Review();
+        $review = new Review;
         $relation = $review->user();
 
         $this->assertInstanceOf(BelongsTo::class, $relation);
         $this->assertEquals('user_id', $relation->getForeignKeyName());
     }
 
-    //書籍リレーションテスト
+    // 書籍リレーションテスト
     public function test_it_belongs_to_a_book(): void
     {
-        $review = new Review();
+        $review = new Review;
         $relation = $review->book();
 
         $this->assertInstanceOf(BelongsTo::class, $relation);
         $this->assertEquals('book_id', $relation->getForeignKeyName());
     }
 
-    //いいねリレーションテスト（レビュー）
+    // いいねリレーションテスト（レビュー）
     public function test_it_has_liked_reviews_relation(): void
     {
-        $review = new Review();
+        $review = new Review;
         $relation = $review->likedReviews();
 
         $this->assertInstanceOf(BelongsToMany::class, $relation);
         $this->assertEquals('review_likes', $relation->getTable());
     }
 
-    //いいねリレーションテスト（ユーザー）
+    // いいねリレーションテスト（ユーザー）
     public function test_it_has_liked_by_users_relation(): void
     {
-        $review = new Review();
+        $review = new Review;
         $relation = $review->likedByUsers();
 
         $this->assertInstanceOf(BelongsToMany::class, $relation);
         $this->assertEquals('review_likes', $relation->getTable());
     }
 
-    //いいねリレーション（中間テーブル）
+    // いいねリレーション（中間テーブル）
     public function test_it_has_review_likes_relation(): void
     {
-        $review = new Review();
+        $review = new Review;
         $relation = $review->review_likes();
 
         $this->assertInstanceOf(BelongsToMany::class, $relation);

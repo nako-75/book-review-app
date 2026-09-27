@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('book_genre', function (Blueprint $table) {
             $table->id();
             $table->foreignId('book_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('genre_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('genre_id')->constrained()->restrictOnDelete();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
         });

@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Api;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class BookApiTest extends TestCase
 {
@@ -23,17 +23,17 @@ class BookApiTest extends TestCase
         $response = $this->getJson('/api/v1/books');
 
         $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'data' => [
-                        '*' => [
-                            'id', 'title', 'author', 'isbn', 'price', 'detail',
-                            'genres', 'reviews_avg_rating', 'reviews_count',
-                            'created_at', 'updated_at'
-                        ]
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => [
+                        'id', 'title', 'author', 'isbn', 'price', 'detail',
+                        'genres', 'reviews_avg_rating', 'reviews_count',
+                        'created_at', 'updated_at',
                     ],
-                    'links',
-                    'meta'
-                ]);
+                ],
+                'links',
+                'meta',
+            ]);
     }
 
     // AP02: 書籍詳細を取得できること（ジャンル、レビュー詳細、投稿者名が含まれる）
@@ -46,10 +46,10 @@ class BookApiTest extends TestCase
         $response = $this->getJson("/api/v1/books/{$book->id}");
 
         $response->assertStatus(200)
-                ->assertJsonFragment([
-                    'id' => $book->id,
-                    'title' => $book->title,
-                ]);
+            ->assertJsonFragment([
+                'id' => $book->id,
+                'title' => $book->title,
+            ]);
     }
 
     // AP02の例外: 存在しないIDを指定した場合はエラー（404）になること
@@ -60,9 +60,7 @@ class BookApiTest extends TestCase
         $response->assertStatus(404);
     }
 
-
     // --- Sanctum 認証セキュリティテスト（未認証時のブロック確認） ---
-
 
     // 未認証ユーザーは書籍を新規登録できない
     public function test_unauthenticated_user_cannot_create_book(): void
@@ -98,9 +96,7 @@ class BookApiTest extends TestCase
         $response->assertStatus(401);
     }
 
-
     // --- Sanctum 認証済みユーザーの操作テスト ---
-
 
     // AP03: Sanctum認証済みユーザーは書籍を新規登録できる
     public function test_can_create_book_with_sanctum_auth(): void
@@ -120,7 +116,7 @@ class BookApiTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-                ->assertJsonFragment(['title' => 'APIテスト書籍']);
+            ->assertJsonFragment(['title' => 'APIテスト書籍']);
 
         $this->assertDatabaseHas('books', ['title' => 'APIテスト書籍']);
     }
@@ -134,7 +130,7 @@ class BookApiTest extends TestCase
         $response = $this->actingAs($user, 'sanctum')->postJson('/api/v1/books', []);
 
         $response->assertStatus(422)
-                ->assertJsonValidationErrors(['title', 'author', 'isbn', 'user_id']);
+            ->assertJsonValidationErrors(['title', 'author', 'isbn', 'user_id']);
     }
 
     // AP04: Sanctum認証済みユーザーは書籍を更新できる
@@ -157,7 +153,7 @@ class BookApiTest extends TestCase
         $response = $this->actingAs($user, 'sanctum')->putJson("/api/v1/books/{$book->id}", $updateData);
 
         $response->assertStatus(200)
-                ->assertJsonFragment(['title' => '新しいタイトルに更新']);
+            ->assertJsonFragment(['title' => '新しいタイトルに更新']);
 
         $this->assertDatabaseHas('books', ['title' => '新しいタイトルに更新']);
     }

@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\Book;
-use Database\Seeders\UserSeeder;
+use App\Models\User;
 use Database\Seeders\BookSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

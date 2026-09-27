@@ -2,23 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class NotificationController extends Controller
 {
-    // 通知一覧
-    public function index()
+    /**
+     * ログインユーザーの通知一覧を表示する
+     */
+    public function index(): View
     {
-        $notifications = Auth::user()->notifications;
+        /** @var User $user */
+        $user = Auth::user();
+
+        $notifications = $user->notifications()->paginate(10);
+
         return view('notifications.index', compact('notifications'));
     }
 
-    // 既読にする
-    public function markAsRead($id)
+    /**
+     * 指定された通知を既読にする
+     *
+     * @param  string  $id
+     */
+    public function markAsRead($id): RedirectResponse
     {
-        $notification = Auth::user()->notifications()->findOrFail($id);
+        /** @var User $user */
+        $user = Auth::user();
+
+        $notification = $user->notifications()->findOrFail($id);
         $notification->markAsRead();
+
         return back()->with('success', '通知を既読にしました。');
     }
 }

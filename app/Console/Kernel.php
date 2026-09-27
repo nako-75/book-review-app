@@ -8,15 +8,18 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 class Kernel extends ConsoleKernel
 {
     /**
-     * Define the application's command schedule.
+     * アプリケーションのコマンドスケジュールを定義する。
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('reading-plan:send-reminders')->daily();
+        // 毎日20時（日本時間）に読書計画のリマインダーを送信する
+        $schedule->command('reading-plan:send-reminders')
+            ->dailyAt('20:00')
+            ->timezone('Asia/Tokyo');
     }
 
     /**
-     * Register the commands for the application.
+     * アプリケーションのコマンドを登録する。
      */
     protected function commands(): void
     {

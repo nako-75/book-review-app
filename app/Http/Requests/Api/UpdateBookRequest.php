@@ -2,14 +2,12 @@
 
 namespace App\Http\Requests\Api;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateBookRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
@@ -18,7 +16,7 @@ class UpdateBookRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -32,7 +30,7 @@ class UpdateBookRequest extends FormRequest
                 'required',
                 'string',
                 'digits_between:10,13',
-                Rule::unique('books', 'isbn')->ignore($bookId)
+                Rule::unique('books', 'isbn')->ignore($bookId),
             ],
             'published_date' => ['sometimes', 'required', 'date'],
             'description' => ['sometimes', 'nullable', 'string'],
@@ -43,6 +41,9 @@ class UpdateBookRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [
