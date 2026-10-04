@@ -116,9 +116,6 @@ Laravel Sanctum によるトークン認証が必要なエンドポイントを�
 | `GET` | `/api/v1/books/{id}` | 特定の書籍詳細の取得 | 不要 |
 | `PUT`/`PATCH` | `/api/v1/books/{id}` | 書籍情報の更新 | 要 (Sanctum) |
 | `DELETE` | `/api/v1/books/{id}` | 書籍の削除 | 要 (Sanctum) |
-| `GET` | `/api/v1/genres` | ジャンル一覧の取得 | 不要 |
-| `POST` | `/api/v1/books/{id}/reviews` | レビューの投稿 | 要 (Sanctum) |
-| `POST` | `/api/v1/books/{id}/favorite` | お気に入り（いいね）の登録・解除 | 要 (Sanctum) |
 
 ## データベース設計（主要テーブル）. 
 * users: ユーザー情報（名前、メールアドレス、パスワード等）
@@ -130,7 +127,7 @@ Laravel Sanctum によるトークン認証が必要なエンドポイントを�
 * notifications:通知関連(Laravel標準機能を使用（自動生成）)
 
 ## 🧪 テスト環境の構築と実行. 
-本プロジェクトでは、フィーチャーテスト用にテスト用のデータベース（`mysql_test`）を使用したテスト環境を構築できます。
+本プロジェクトでは、フィーチャーテスト用にテスト用のデータベースを使用したテスト環境を構築できます。
 
 ### 1. テスト用データベースの作成
 まず、MySQLコンテナにログインします。
@@ -139,7 +136,7 @@ sail mysql
 ```
 MySQLのプロンプトが表示されたら、テスト用のデータベースを手動で作成します。
 ```
-CREATE DATABASE demo_test;
+CREATE DATABASE testing_demo;
 EXIT;
 ```
 
